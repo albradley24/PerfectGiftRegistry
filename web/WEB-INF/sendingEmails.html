@@ -1,0 +1,62 @@
+<!--Amanda Bradley
+ITSCM 325, Web Development
+Spring 2016
+Gift Giver Page-->
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+        <title> Perfect Gift: Gift Registry </title>
+        <link rel="stylesheet" href="stylesheet.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    
+        <script>
+            function SendingEmails()
+            {
+                $.confirm(
+                {
+                    title: 'Confirm',
+                    content: 'Are you sure youw want to invite ' + registeredGifter.val() + "?",
+                    confirm: function()
+                    {
+                        $.ajax(
+                            {                    
+                                type: "POST",
+                                url: "https://mandrillapp.com/api/1.0/messages/send.json",
+                            data: 
+                            {
+                                'key': "7283617eaa79f11b2cc2e6aa65ca3720-us13",
+                            'message': 
+                                {
+                                  'from_email': 'albradley24@gmail.com',
+                                  'to': 
+                                    [
+                                      {
+                                        'email': emailAddress.val(),
+                                        'name': registeredGifter.val(),
+                                        'type': 'to'
+                                      }
+                                    ],
+                                  'autotext': 'true',
+                                  'subject': 'You have been invited to Perfect Gift: Gift Registry!',
+                                  'html': 'Amanda has invited you to view gifts for her upcoming event(s)!'
+                                }
+                            }
+                            }).done(function(response) 
+                            {
+                                console.log(response);
+                            });
+                        $.alert('Email successfully sent!');
+                    },
+                    cancel: function()
+                    {
+                        $.alert('Email cancelled.');
+                    }
+                });
+            }
+        </script>
+    </head>
+</html>
+    

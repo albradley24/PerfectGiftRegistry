@@ -1,0 +1,106 @@
+/* Amanda Bradley
+ITSCM 325, Web Development
+Spring 2016
+Cascading Style Sheet */
+
+/* Background */
+html 
+{
+    background-image: url("images/polkadots3.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+}
+
+#indexheader
+{
+        height: 160px;
+        padding-bottom: 15px;
+}
+
+header
+{
+    height: 160px;
+    padding-bottom: 10px;
+    text-align: center;
+    color: red;
+}
+
+#date
+{
+    text-align: center;
+    color: black;
+    padding-top: 25px;
+}
+
+#addImageButton
+{
+    margin-left: auto;
+    text-align: center;
+}
+
+#exitButton, #deleteButton, #returnButton, #inviteGifterButton, #submitGifterButton, #returnGifterButton
+{
+    margin-top: 5px;
+}
+
+
+/*Body */
+body
+{
+    font-size: 100%;
+    width: 800px;
+    background-color: white;
+    border: 3px solid black;
+    font-family: Arial, Helvetica, sans-serif, Verdana;
+    margin: 20px auto;
+    box-shadow: 5px 10px 20px 5px;
+}
+
+h2
+{
+    text-align: center;
+}
+
+h3
+{
+    text-align: center;
+    color: red;
+}
+
+#Login, #newGift
+{
+    text-align: center;
+}
+
+#enterEvent, #newGifter, #newGift, #inviteGifterForm
+{
+    text-align: center;
+    margin-left:auto; 
+    margin-right:auto;
+}
+
+div
+{
+    text-align: center;
+}
+
+
+/* Section */
+#Table1, #Table2, #giftTableItem
+{
+    text-align: center;
+        margin-left:auto; 
+        margin-right:auto;
+        margin-bottom: 10px;
+}
+
+
+/* Footer */
+footer
+{
+    text-align: center;
+    padding-top: 10px;
+}
+
+/* &copy; Amanda Bradley, Spring 2016 UW-Whitewater, ITSCM325 Web Development Project */

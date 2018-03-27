@@ -1,0 +1,473 @@
+<!--Amanda Bradley
+ITSCM 325, Web Development
+Spring 2016
+Gift List -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title> Perfect Gift: Gift Registry </title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    
+    <script>
+    $(document).ready(function () 
+    {
+        $("#newGiftEntry").hide('now');
+        $("#returnButton").hide('now');
+        $("#newGiftButton2").hide('now');
+        LoadGifts();
+    });
+
+    function LoadGifts() 
+    {
+        $.ajax(
+            {
+            url:"GiftManager",
+            type:"POST",
+            dataType:"xml",
+            success: function(XML) 
+            {
+                giftList = XML;
+                var misc = "<table id=\"giftTableItem\" border=\"2\" width=\"700\" cellspacing=\"2\" cellpadding=\"2\"><tr><th>Gift Number</th><th>Gift Name</th><th>Gift Price</th><th>Gift Location <br> (Where to Buy It)</th><th>Gift URL</th><th>Gift Description</th><th>Image</th><th>Update</th>";
+                $(giftList).find("Gift").each(function () 
+                {
+                    var giftID = $(this).find("giftID").text();
+                    console.log(giftID);
+                    misc = misc + "<tr><td>" + giftID + "</td>";
+                    var giftName = $(this).find("giftName").text();
+                    misc = misc + "<td>" + giftName + "</td>";
+                    var giftPrice = $(this).find("giftPrice").text();
+                    misc = misc + "<td>" + giftPrice + "</td>";
+                    var giftLocation = $(this).find("giftLocation").text();
+                    misc = misc + "<td>" + giftLocation + "</td>";
+                    var giftURL = $(this).find("giftURL").text();
+                    misc = misc + "<td>" + giftURL + "</td>";
+                    var giftDescription = $(this).find("giftDescription").text();
+                    misc = misc + "<td>" + giftDescription + "</td>";
+                    var imageName = $(this).find("imageName").text();
+                    misc = misc + "<td>" + imageName + "</td>";
+                    misc = misc + "<td> <input type=\"radio\" name=\"giftRowNumber\" value=\"" + giftID + "\"/></td></tr>";
+                    console.log(misc);
+                });
+                misc = misc + "</table>";
+                $("#giftTable").html(misc);
+                $("#updateButton").show('now');
+                $("#returnButton").hide('now');
+                $("#addImageButton").show('now');
+                $("#newGiftButton2").hide('now');
+            }
+        });
+    }
+    
+    function DeleteGift() 
+    {
+        var giftID = $("input[type='radio'][name='giftRowNumber']:checked").attr("value");
+        console.log(giftID);
+        var deleteString = "Delete=Delete&giftRowNumber=" + giftID;
+        var agree = confirm("Are you sure you want to delete the selected gift?");
+        if(agree)
+        {
+            $.ajax(
+            {
+               type:"post",
+               url:"GiftManager",
+               data:deleteString,
+               success: function() 
+               {
+                   LoadGifts();
+               }
+            });
+        }
+    };
+    
+    function showAddGift()
+    {
+        $("#giftTable").fadeOut('Fast');
+        $("#newGiftEntry").fadeIn('Fast');
+        $("#newGiftButton").hide('now');
+        $("#updateButton").hide('now');
+        $("#deleteButton").show('now');
+        $("#returnButton").show('now');
+    };
+        
+    function AddGift()
+    {
+        if(GiftErrorHandler()=== true)
+        {
+            var addString = "Add=Add&giftName=" + $("#giftName").val();
+            addString = addString + "&giftPrice=" + $("#giftPrice").val();
+            addString = addString + "&giftLocation=" + $("#giftLocation").val();
+            addString = addString + "&giftURL=" + $("#giftURL").val();
+            addString = addString + "&giftDescription=" + $("#giftDescription").val();
+            addString = addString + "&imageName=" + $("#imageName").val();
+            {
+                $.ajax(
+                {
+                    type:"post",
+                    url:"GiftManager",
+                    data:addString,
+                    success: function()
+                    {
+                        LoadGifts();
+                        $("#newGiftEntry").hide('now');
+                        $("#giftTable").fadeIn('Fast');
+                        $("#newGiftButton").show('now');
+                        $("#updateButton").hide('now');
+                        $("#newGiftButton2").val("New Gift");
+                        $("#returnButton").hide('now');
+                        
+                        $("#giftName").val("");
+                        $("#giftPrice").val("");
+                        $("#giftLocation").val("");
+                        $("#giftURL").val("");
+                        $("#giftDescription").val("");
+                        $("#imageName").val("");
+                    }
+                });
+            }
+        }
+    };
+        
+    function ItemDefaults()
+    {
+        LoadGifts();
+        $("#newGiftEntry").hide('now');
+        $("#giftTable").fadeIn('Fast');
+        $("#newGiftButton").show('now');
+        $("#updateButton").show('now');
+        $("#newGiftButton2").val("New Gift");
+        $("#returnButton").hide('now');
+        $("#giftName").val("");
+        $("#giftPrice").val("");
+        $("#giftLocation").val("");
+        $("#giftURL").val("");
+        $("#giftDescription").val("");
+        $("#imageName").val("");
+    }
+    
+    function AddImage()
+    {
+        $(function () 
+        {
+            $(":file").change(function () 
+            {
+                if (this.files && this.files[0]) 
+                {
+                    var reader = new FileReader();
+
+                    reader.onload = imageIsLoaded;
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        });
+    }
+
+    function imageIsLoaded(e) 
+    {
+        $('#myImage').attr('src', e.target.result);
+        $('#imageName').attr('src', e.target.result);
+    };
+                
+    function GetGift()
+    {
+        var giftID = $("input[type='radio'][name='giftRowNumber']:checked").attr("value");
+        var giftString = "GetGift=GetGift&giftRowNumber=" + giftID;
+        var agree = confirm("Are you sure you want to modify the selected gift?");
+        if(agree)
+        {
+            $.ajax(
+            {
+                url:"GiftManager",
+                type:"POST",
+                data:giftString,
+                success: function() 
+                {
+                    giftList = xml;
+                    var giftName = "";
+                    var giftPrice = "";
+                    var giftLocation = "";
+                    var giftURL = "";
+                    var giftDescription = "";
+                    var imageName = "";
+                    $(giftList).find("Gift").each(function () 
+                    {
+                        giftID = $(this).find("giftID").text();
+                        giftName = $(this).find("giftName").text();
+                        giftPrice = $(this).find("giftPrice").text();
+                        giftLocation = $(this).find("giftLocation").text();
+                        giftURL = $(this).find("giftURL").text();
+                        giftDescription = $(this).find("giftDescription").text();
+                        imageName = $(this).find("imageName").text();
+                    });
+
+                    $("#giftName").val(giftName);
+                    $("#giftPrice").val(giftPrice);
+                    $("#giftLocation").val(giftLocation);
+                    $("#giftURL").val(giftURL);
+                    $("#giftDescription").val(giftDescription);
+                    $("#imageName").val(imageName);
+                    showAddGift();
+                    $("#updateButton").hide('now');
+                    $("#newGiftButton2").val("Update");
+                }
+            });
+        }
+    }    
+    
+    function GiftErrorHandler()
+    {     
+        if(GiftNameErrorHandler() === true)
+        {
+            if(GiftPriceErrorHandler() === true)
+            {
+                if(GiftLocationErrorHandler() === true)
+                {
+                    if(GiftURLErrorHandler() === true)
+                    {
+                        if(GiftDescriptionErrorHandler() === true)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
+        function GiftNameErrorHandler()
+        {
+            var giftName = $("#giftName").val();
+            if(giftName !== null && giftName !== "")
+            {
+                if(giftName.indexOf("@") >= 0)
+                {
+                    alert("Gift Name: Invalid character @");
+                    return false;
+                }
+                if(giftName.indexOf(";") >= 0)
+                {
+                    alert("Gift Name: Invalid character ;");
+                    return false;
+                }
+                if(giftName.indexOf("<") >= 0)
+                {
+                    alert("Gift Name: Invalid character <");
+                    return false;
+                }
+                if(giftName.indexOf(">") >= 0)
+                {
+                    alert("Gift Name: Invalid character >"); 
+                    return false;
+                }
+                if(giftName.indexOf("=") >= 0)
+                {
+                    alert("Gift Name: Invalid character =");
+                    return false;
+                }
+            } 
+            else
+            {
+                alert("Please enter a value for Gift Name");
+            }
+            return true;
+        }
+        
+        function GiftPriceErrorHandler()
+        {
+            var giftPrice = $("#giftPrice").val();
+            if(giftPrice !== null && giftPrice !== "")
+            {
+                if(giftPrice.indexOf("@") >= 0)
+                {
+                    alert("Gift Price: Invalid character @");
+                    return false; 
+                }
+                if(giftPrice.indexOf(";") >= 0)
+                {
+                    alert("Gift Price: Invalid character ;");
+                    return false;
+                }
+                if(giftPrice.indexOf("<") >= 0)
+                {
+                    alert("Gift Price: Invalid character <");
+                    return false;
+                }
+                if(giftPrice.indexOf(">") >= 0)
+                {
+                    alert("Gift Price: Invalid character >");
+                    return false; 
+                }
+                if(giftPrice.indexOf("=") >= 0)
+                {
+                    alert("Gift Price: Invalid character =");
+                    return false;
+                }
+            }
+            else
+            {
+                alert("Please enter a value for Gift Price");
+            }
+            return true;
+        }
+
+        function GiftLocationErrorHandler()
+        {
+            var giftLocation = $("#giftLocation").val();
+            if(giftLocation !== null && giftLocation !== "")
+            {
+                if(giftLocation.indexOf("@") >= 0)
+                {
+                    alert("Gift Location: Invalid character @");
+                    return false; 
+                }
+                if(giftLocation.indexOf(";") >= 0)
+                {
+                    alert("Gift Location: Invalid character ;");
+                    return false; 
+                }
+                if(giftLocation.indexOf("<") >= 0)
+                {
+                    alert("Gift Location: Invalid character <");
+                    return false; 
+                }
+                if(giftLocation.indexOf(">") >= 0)
+                {
+                    alert("Gift Location: Invalid character >");
+                    return false; 
+                }
+                if(giftLocation.indexOf("=") >= 0)
+                {
+                    alert("Gift Location: Invalid character =");
+                    return false; 
+                }
+            }
+            else
+            {
+                alert("Please enter a value for Gift Location");
+            }
+            return true;
+        }
+
+        function GiftURLErrorHandler()
+        {
+            var giftURL = $("#giftURL").val();
+            if(giftURL !== null && giftURL !== "")
+            {
+                if(giftURL.indexOf("www") < 0)
+                {
+                    alert("Gift URL: Must contain www");
+                    return false; 
+                }
+                if(giftURL.indexOf(".") < 0)
+                {
+                    alert("Gift URL: Must contain at least one .");
+                    return false; 
+                }
+            }
+            else
+            {
+                alert("Please enter a value for Gift URL");
+            }
+            return true;
+        }
+
+        function GiftDescriptionErrorHandler()
+        {
+            var giftDescription = $("#giftDescription").val();
+            if(giftDescription !== null && giftDescription !== "")
+            {
+                if(giftDescription.indexOf("@") >= 0)
+                {
+                    alert("Gift Description: Invalid character @");
+                    return false; 
+                }
+                if(giftDescription.indexOf(";") >= 0)
+                {
+                    alert("Gift Description: Invalid character ;");
+                    return false; 
+                }
+                if(giftDescription.indexOf("<") >= 0)
+                {
+                    alert("Gift Description: Invalid character <");
+                    return false; 
+                }
+                if(giftDescription.indexOf(">") >= 0)
+                {
+                    alert("Gift Description: Invalid character >");
+                    return false; 
+                }
+                if(giftDescription.indexOf("=") >= 0)
+                {
+                    alert("Gift Description: Invalid character =");
+                    return false; 
+                }
+            }
+            else
+            {
+                alert("Please enter a value for Gift Description");
+            }
+            return true;
+        }
+    </script>
+    <link rel="stylesheet" href="stylesheet.css"> 
+</head>
+<header>
+    <img src="images/banner.jpg" alt="Banner" width="800" height="160">
+</header>
+<section>
+    <h2> Wish List for Selected Event: </h2>
+    <div id="giftTable"></div>
+    <div id="newGift">
+        <form id="newGiftEntry" action="javascript:AddGift()">
+            Gift Name: <br>
+                <input type="text" name="giftName" id="giftName"><br><br>
+            Gift Price: <br>
+                <input type="text" name="giftPrice" id="giftPrice"><br><br>
+            Gift Location: <br>
+                <input type="text" name="giftLocation" id="giftLocation"><br><br>
+            Gift URL: <br>
+                <input type="text" name="giftURL" id="giftURL"><br><br>
+            Gift Description: <br>
+            <textarea name="giftDescription" rows="4" cols="30" id="giftDescription"></textarea><br><br>
+            Gift Image: <br>
+            <input type="file" name="imageName" value="Add Image" accept="image/*" id="addImageButton"/><br>
+        </form>
+            <input type="submit" name="addGift" value="Add Gift" id="newGiftButton2"><br>
+    </div>
+<div>
+    <input type="submit" name="ShowField" value="Add Gift" onClick="showAddGift()"/>
+    <input type="submit" name="Update" value="Update" id="updateButton" onclick="GetGift()"/>
+    <input type="submit" name="Delete" value="Delete" id="deleteButton" onClick="DeleteGift()"/>    
+    <input type="submit" name="Exit" value="Return" id="returnButton" onClick="ItemDefaults()"/>
+    <form action="EventMgrCtrl">
+        <input id="exitButton" type="submit" name="menu" value="Exit" onClick="ExitGift()"/>
+    </form>
+</div>
+</section>
+    <footer>
+        <p> &copy; Amanda Bradley, Spring 2016 UW-Whitewater, ITSCM325 Web Development Project</p>
+    </footer>
+</body>
+</html>
